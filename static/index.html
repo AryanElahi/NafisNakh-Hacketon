@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>دستیار هوشمند مشتریان — نفیس نخ</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light;
+  --surface-1:#fcfcfb; --plane:#f4f4f1; --raised:#ffffff;
+  --ink-1:#0b0b0b; --ink-2:#52514e; --ink-3:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --hair:rgba(11,11,11,.10);
+  --series-1:#2a78d6; --series-2:#eb6834;
+  --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --crit:#d03b3b;
+  --good-ink:#006300;
+  --seq-100:#cde2fb; --seq-250:#86b6ef; --seq-450:#2a78d6; --seq-600:#184f95;
+  --r:10px; --shadow:0 1px 2px rgba(11,11,11,.05),0 4px 14px rgba(11,11,11,.04);
+}
+@media (prefers-color-scheme: dark){
+  :root:where(:not([data-theme="light"])){
+    color-scheme: dark;
+    --surface-1:#1a1a19; --plane:#0d0d0d; --raised:#232322;
+    --ink-1:#ffffff; --ink-2:#c3c2b7; --ink-3:#898781;
+    --grid:#2c2c2a; --axis:#383835; --hair:rgba(255,255,255,.10);
+    --series-1:#3987e5; --series-2:#d95926;
+    --good-ink:#0ca30c;
+    --seq-100:#0d366b; --seq-250:#184f95; --seq-450:#3987e5; --seq-600:#86b6ef;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --surface-1:#1a1a19; --plane:#0d0d0d; --raised:#232322;
+  --ink-1:#ffffff; --ink-2:#c3c2b7; --ink-3:#898781;
+  --grid:#2c2c2a; --axis:#383835; --hair:rgba(255,255,255,.10);
+  --series-1:#3987e5; --series-2:#d95926;
+  --good-ink:#0ca30c;
+  --seq-100:#0d366b; --seq-250:#184f95; --seq-450:#3987e5; --seq-600:#86b6ef;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:Vazirmatn,"Segoe UI",Tahoma,system-ui,sans-serif;
+  background:var(--plane); color:var(--ink-1);
+  font-size:14px; line-height:1.7; -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{margin:0;font-weight:700;line-height:1.4}
+a{color:var(--series-1)}
+button{font-family:inherit;font-size:inherit;cursor:pointer}
+.tnum{font-variant-numeric:tabular-nums}
+
+/* ─── چیدمان ─── */
+header{
+  background:var(--surface-1); border-bottom:1px solid var(--hair);
+  padding:12px 20px; display:flex; align-items:center; gap:16px;
+  position:sticky; top:0; z-index:50;
+}
+header .brand{display:flex;flex-direction:column;gap:1px}
+header h1{font-size:16px}
+header .sub{font-size:11.5px;color:var(--ink-3)}
+header .spacer{flex:1}
+.badge{
+  font-size:11.5px;padding:3px 10px;border-radius:99px;
+  border:1px solid var(--hair); color:var(--ink-2); background:var(--plane);
+  display:inline-flex;align-items:center;gap:5px;white-space:nowrap
+}
+.badge .dot{width:7px;height:7px;border-radius:99px;background:var(--ink-3)}
+.badge.live .dot{background:var(--good)}
+.badge.det .dot{background:var(--warn)}
+.iconbtn{
+  background:var(--plane);border:1px solid var(--hair);border-radius:8px;
+  padding:5px 11px;color:var(--ink-2);font-size:12.5px
+}
+.iconbtn:hover{background:var(--raised);color:var(--ink-1)}
+
+nav.tabs{
+  background:var(--surface-1);border-bottom:1px solid var(--hair);
+  padding:0 20px;display:flex;gap:2px;position:sticky;top:57px;z-index:49;overflow-x:auto
+}
+nav.tabs button{
+  background:none;border:none;border-bottom:2px solid transparent;
+  padding:11px 15px;color:var(--ink-2);font-size:13.5px;white-space:nowrap
+}
+nav.tabs button:hover{color:var(--ink-1)}
+nav.tabs button[aria-selected="true"]{color:var(--ink-1);border-bottom-color:var(--series-1);font-weight:700}
+
+main{padding:20px;max-width:1560px;margin:0 auto}
+.view{display:none}
+.view.on{display:block}
+
+/* ─── کارت ─── */
+.card{
+  background:var(--surface-1);border:1px solid var(--hair);border-radius:var(--r);
+  padding:16px 18px;box-shadow:var(--shadow)
+}
+.card > h3{font-size:13.5px;margin-bottom:3px}
+.card > .hint{font-size:11.5px;color:var(--ink-3);margin-bottom:12px;line-height:1.6}
+.grid{display:grid;gap:14px}
+.g6{grid-template-columns:repeat(6,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:1180px){.g6{grid-template-columns:repeat(3,1fr)}.g4,.g3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:760px){.g6,.g4,.g3,.g2{grid-template-columns:1fr}}
+
+/* ─── کاشی آماری ─── */
+.tile{background:var(--surface-1);border:1px solid var(--hair);border-radius:var(--r);padding:13px 15px}
+.tile .lab{font-size:11.5px;color:var(--ink-2);margin-bottom:5px}
+.tile .val{font-size:23px;font-weight:700;letter-spacing:-.2px;line-height:1.25}
+.tile .sub{font-size:10.5px;line-height:1.55;color:var(--ink-3);margin-top:3px}
+.tile.neg .val{color:var(--crit)}
+.tile.pos .val{color:var(--good-ink)}
+
+/* ─── نشان وضعیت ─── */
+.chip{
+  display:inline-flex;align-items:center;gap:5px;font-size:11.5px;
+  padding:2px 9px;border-radius:6px;border:1px solid var(--hair);
+  background:var(--plane);color:var(--ink-2);white-space:nowrap
+}
+.chip svg{width:11px;height:11px;flex:none}
+.chip.critical{border-color:var(--crit);color:var(--crit)}
+.chip.high{border-color:var(--serious);color:var(--serious)}
+.chip.medium{border-color:var(--warn);color:var(--ink-2)}
+.chip.low{color:var(--ink-3)}
+.chip.good{border-color:var(--good);color:var(--good-ink)}
+
+/* ─── جدول ─── */
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{
+  text-align:right;font-weight:700;color:var(--ink-2);font-size:11.5px;
+  padding:7px 9px;border-bottom:1px solid var(--axis);white-space:nowrap;
+  position:sticky;top:0;background:var(--surface-1);cursor:pointer;user-select:none
+}
+th:hover{color:var(--ink-1)}
+th .arw{color:var(--series-1)}
+td{padding:7px 9px;border-bottom:1px solid var(--grid);white-space:nowrap}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:var(--plane)}
+tbody tr.sel{background:color-mix(in oklab,var(--series-1) 10%,var(--surface-1))}
+.twrap{overflow:auto;max-height:640px;border-radius:8px;border:1px solid var(--hair)}
+.mono{font-variant-numeric:tabular-nums}
+.num{text-align:left;direction:ltr;font-variant-numeric:tabular-nums}
+
+/* ─── ورودی ─── */
+input[type=text],select,textarea{
+  font-family:inherit;font-size:13px;padding:7px 11px;border-radius:8px;
+  border:1px solid var(--hair);background:var(--raised);color:var(--ink-1);width:100%
+}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--series-1);outline-offset:-1px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:11.5px;color:var(--ink-2)}
+.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px}
+.filters > *{min-width:150px}
+.filters .grow{flex:1;min-width:210px}
+
+/* ─── فهرست ریسک/فرصت ─── */
+.rlist{display:flex;flex-direction:column;gap:9px}
+.ritem{border:1px solid var(--hair);border-radius:9px;padding:11px 13px;background:var(--raised)}
+.ritem.critical{border-right:3px solid var(--crit)}
+.ritem.high{border-right:3px solid var(--serious)}
+.ritem.medium{border-right:3px solid var(--warn)}
+.ritem.low{border-right:3px solid var(--axis)}
+.ritem .t{font-weight:700;font-size:13px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ritem .ev{font-size:12px;color:var(--ink-2);margin-top:6px}
+.ritem .ac{font-size:12px;margin-top:6px;padding-top:6px;border-top:1px dashed var(--grid);color:var(--ink-1)}
+.ritem .ow{color:var(--ink-3);font-size:11px}
+
+/* ─── اقدام بعدی ─── */
+.nba{display:flex;flex-direction:column;gap:10px}
+.nbaitem{
+  display:flex;gap:12px;padding:13px;border-radius:9px;background:var(--raised);
+  border:1px solid var(--hair);align-items:flex-start
+}
+.nbaitem .rank{
+  width:26px;height:26px;flex:none;border-radius:99px;display:grid;place-items:center;
+  background:var(--series-1);color:#fff;font-weight:700;font-size:12.5px
+}
+.nbaitem .body{flex:1}
+.nbaitem .body .a{font-weight:700;font-size:13px}
+.nbaitem .body .m{font-size:11.5px;color:var(--ink-3);margin-top:4px;display:flex;gap:12px;flex-wrap:wrap}
+.nbaitem .body .e{font-size:12px;color:var(--ink-2);margin-top:6px}
+
+/* ─── خط زمان ─── */
+.tl{display:flex;flex-direction:column;gap:0;position:relative;padding-right:16px}
+.tl:before{content:"";position:absolute;right:4px;top:6px;bottom:6px;width:1px;background:var(--grid)}
+.tli{padding:9px 0;position:relative}
+.tli:before{
+  content:"";position:absolute;right:-16px;top:15px;width:9px;height:9px;border-radius:99px;
+  background:var(--surface-1);border:2px solid var(--axis)
+}
+.tli.c:before{border-color:var(--crit)}
+.tli.d:before{border-color:var(--series-2)}
+.tli.i:before{border-color:var(--series-1)}
+.tli .h{font-size:12px;display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.tli .h .dt{color:var(--ink-3);font-variant-numeric:tabular-nums}
+.tli .x{font-size:12.5px;color:var(--ink-1);margin-top:3px}
+
+/* ─── نمودار ─── */
+.chart{position:relative;margin-bottom:10px}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px;font-size:12px;color:var(--ink-2)}
+.legend i{width:11px;height:11px;border-radius:3px;display:inline-block;margin-inline-end:6px;vertical-align:-1px}
+.tip{
+  position:absolute;pointer-events:none;opacity:0;transition:opacity .1s;
+  background:var(--raised);border:1px solid var(--hair);border-radius:8px;
+  padding:8px 11px;font-size:12px;box-shadow:var(--shadow);z-index:20;min-width:130px
+}
+.tip .th{font-weight:700;margin-bottom:4px;font-size:11.5px;color:var(--ink-2)}
+.tip .tr{display:flex;justify-content:space-between;gap:14px}
+.tip .tr b{font-variant-numeric:tabular-nums}
+.toggle{background:none;border:none;color:var(--ink-3);font-size:11.5px;padding:2px 0;text-decoration:underline}
+
+/* ─── دستیار ─── */
+.chatwrap{display:grid;grid-template-columns:1fr 300px;gap:14px}
+@media(max-width:980px){.chatwrap{grid-template-columns:1fr}}
+.msgs{display:flex;flex-direction:column;gap:12px;min-height:340px;max-height:60vh;overflow:auto;padding-inline-end:4px}
+.msg{max-width:88%;padding:11px 14px;border-radius:12px;font-size:13px;white-space:pre-wrap;line-height:1.75}
+.msg.u{align-self:flex-start;background:var(--series-1);color:#fff;border-bottom-right-radius:4px}
+.msg.a{align-self:flex-end;background:var(--raised);border:1px solid var(--hair);border-bottom-left-radius:4px}
+.msg .tools{margin-top:8px;padding-top:7px;border-top:1px dashed var(--grid);font-size:11px;color:var(--ink-3)}
+.askrow{display:flex;gap:9px;margin-top:14px}
+.askrow input{flex:1}
+.btn{
+  background:var(--series-1);color:#fff;border:none;border-radius:8px;
+  padding:8px 18px;font-weight:700;font-size:13px
+}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.sugg{display:flex;flex-direction:column;gap:7px}
+.sugg button{
+  text-align:right;background:var(--raised);border:1px solid var(--hair);
+  border-radius:8px;padding:8px 11px;font-size:12px;color:var(--ink-2);line-height:1.6
+}
+.sugg button:hover{border-color:var(--series-1);color:var(--ink-1)}
+
+.empty{color:var(--ink-3);font-size:13px;padding:34px 10px;text-align:center}
+.caveat{
+  background:var(--plane);border:1px solid var(--hair);border-right:3px solid var(--warn);
+  border-radius:8px;padding:10px 13px;font-size:12px;color:var(--ink-2);line-height:1.75
+}
+.caveat ol{margin:6px 0 0;padding-inline-start:18px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:12.5px}
+.kv dt{color:var(--ink-2)}
+.kv dd{margin:0;font-variant-numeric:tabular-nums}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid var(--hair);
+  border-top-color:var(--series-1);border-radius:99px;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <h1>دستیار هوشمند یکپارچه‌سازی و تحلیل تعاملات مشتریان</h1>
+    <span class="sub">نفیس نخ · هکاتون پل سوم · کارخانه هوش مصنوعی ایران</span>
+  </div>
+  <div class="spacer"></div>
+  <span class="badge" id="asof">—</span>
+  <span class="badge" id="mode">—</span>
+  <button class="iconbtn" id="theme" title="تغییر روشنایی">◐ تم</button>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button role="tab" aria-selected="true"  data-v="overview">نمای کل سبد</button>
+  <button role="tab" aria-selected="false" data-v="customers">پروفایل مشتری</button>
+  <button role="tab" aria-selected="false" data-v="text">جست‌وجوی متن سازمان</button>
+  <button role="tab" aria-selected="false" data-v="chat">دستیار هوشمند</button>
+</nav>
+
+<main>
+
+<!-- ══════════════════════════ نمای کل ══════════════════════════ -->
+<section class="view on" id="v-overview">
+  <div class="grid g6" id="kpis" style="margin-bottom:14px"></div>
+
+  <div class="card" style="margin-bottom:14px">
+    <h3>رشد فروش واقعی نیست — تورم است</h3>
+    <p class="hint" id="halves-note"></p>
+    <div id="halves"></div>
+  </div>
+
+  <div class="grid g2" style="margin-bottom:14px">
+    <div class="card">
+      <h3>روند ماهانه: شاخص فروش اسمی در برابر شاخص حجم</h3>
+      <p class="hint">هر دو بر پایهٔ فروردین ۱۳۹۹ = ۱۰۰ و بی‌واحد، پس روی یک محور قابل مقایسه‌اند. دو ماه ناقص مرزی از نمودار حذف شده‌اند.</p>
+      <div class="legend" id="lg-index"></div>
+      <div class="chart" id="ch-index"></div>
+      <button class="toggle" data-table="ch-index">نمایش جدول داده</button>
+      <div id="tb-ch-index" hidden></div>
+    </div>
+    <div class="card">
+      <h3>حاشیه سود ناخالص ماهانه</h3>
+      <p class="hint">قیمت واحد ۸ برابر شده اما حاشیه در تمام ۲۹ ماه در باند ۷ تا ۱۳ درصد مانده: افزایش بهای تمام‌شده تقریباً کامل به مشتری منتقل شده و هیچ گسترش حاشیه‌ای رخ نداده است.</p>
+      <div class="legend" id="lg-margin"></div>
+      <div class="chart" id="ch-margin"></div>
+      <button class="toggle" data-table="ch-margin">نمایش جدول داده</button>
+      <div id="tb-ch-margin" hidden></div>
+    </div>
+  </div>
+
+  <div class="grid g2" style="margin-bottom:14px">
+    <div class="card">
+      <h3>ریسک‌های شناسایی‌شده در سبد</h3>
+      <p class="hint">تعداد مشتری و مبلغ معوق درگیر در هر ریسک. برای پالایش، روی هر سطر کلیک کنید.</p>
+      <div id="riskbars"></div>
+    </div>
+    <div class="card">
+      <h3>فرصت‌های شناسایی‌شده در سبد</h3>
+      <p class="hint">تعداد مشتری و فروش تاریخی مرتبط با هر فرصت.</p>
+      <div id="oppbars"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>هشدارهای داده — پیش از تصمیم‌گیری بخوانید</h3>
+    <div class="caveat"><ol id="caveats"></ol></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ مشتریان ══════════════════════════ -->
+<section class="view" id="v-customers">
+  <div class="card" style="margin-bottom:14px">
+    <div class="filters">
+      <label class="f grow">جست‌وجوی شناسهٔ مشتری
+        <input type="text" id="f-q" placeholder="مثلاً 937594 یا C_937594" autocomplete="off"></label>
+      <label class="f">مرتب‌سازی بر اساس<select id="f-sort"></select></label>
+      <label class="f">بخش مشتری<select id="f-seg">
+        <option value="">همه</option><option>A</option><option>B</option><option>C</option></select></label>
+      <label class="f">دارای ریسک<select id="f-risk"><option value="">همه</option></select></label>
+      <label class="f">دارای فرصت<select id="f-opp"><option value="">همه</option></select></label>
+    </div>
+    <div class="twrap"><table id="tbl">
+      <thead><tr id="thead"></tr></thead><tbody id="tbody"></tbody></table></div>
+    <p class="hint" id="tblnote" style="margin:10px 0 0"></p>
+  </div>
+  <div id="detail"><div class="card"><div class="empty">یک مشتری را از جدول بالا انتخاب کنید تا پروفایل یکپارچه‌اش ساخته شود.</div></div></div>
+</section>
+
+<!-- ══════════════════════════ متن ══════════════════════════ -->
+<section class="view" id="v-text">
+  <div class="card" style="margin-bottom:14px">
+    <h3>جست‌وجو در دانش متنی سازمان</h3>
+    <p class="hint">این بخش متن شکایت‌های مشتریان، گزارش‌های کارشناسان فروش در CRM و شرح درخواست‌های توسعه محصول را می‌کاود — همان دانشی که در اکسل و داشبورد مدیریتی دیده نمی‌شود.</p>
+    <div class="filters">
+      <label class="f grow">عبارت جست‌وجو
+        <input type="text" id="t-q" placeholder="مثلاً: شید رنگ، پرز، استحکام، بسته‌بندی، رگه" autocomplete="off"></label>
+      <label class="f">نوع رکورد<select id="t-kind">
+        <option value="">همه</option><option>شکایت</option><option>تعامل CRM</option><option>درخواست توسعه</option></select></label>
+      <button class="btn" id="t-go">جست‌وجو</button>
+    </div>
+    <div id="t-summary"></div>
+  </div>
+  <div id="t-results"></div>
+</section>
+
+<!-- ══════════════════════════ دستیار ══════════════════════════ -->
+<section class="view" id="v-chat">
+  <div class="chatwrap">
+    <div class="card">
+      <h3>پرسش و پاسخ دربارهٔ مشتریان</h3>
+      <p class="hint">دستیار هیچ عددی را خودش محاسبه نمی‌کند؛ ابزارهای تحلیلی را صدا می‌زند و فقط نتیجهٔ آن‌ها را روایت می‌کند. ابزارهای فراخوانی‌شدهٔ هر پاسخ زیر آن نشان داده می‌شود.</p>
+      <div class="msgs" id="msgs"></div>
+      <div class="askrow">
+        <input type="text" id="q" placeholder="پرسش خود را بنویسید…" autocomplete="off">
+        <button class="btn" id="send">بپرس</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>نمونه پرسش</h3>
+      <p class="hint">برای شروع یکی را انتخاب کنید.</p>
+      <div class="sugg" id="sugg"></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+'use strict';
+/* ═══════════════════════════════ ابزارهای پایه ═══════════════════════════════ */
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const el=(t,a={},...kids)=>{const n=document.createElement(t);
+  for(const[k,v]of Object.entries(a)){ if(v==null)continue;
+    if(k==='class')n.className=v; else if(k==='html')n.innerHTML=v;
+    else if(k.startsWith('on'))n.addEventListener(k.slice(2),v); else n.setAttribute(k,v);}
+  for(const c of kids.flat()) if(c!=null) n.append(c.nodeType?c:document.createTextNode(c));
+  return n;};
+const N=x=>x==null||Number.isNaN(x)?null:x;
+const money=x=>{ if(N(x)==null)return'—'; const s=x<0?'-':''; const a=Math.abs(x);
+  if(a>=1e9)return s+(a/1e9).toLocaleString('en-US',{maximumFractionDigits:2})+' میلیارد';
+  if(a>=1e6)return s+(a/1e6).toLocaleString('en-US',{maximumFractionDigits:1})+' میلیون';
+  if(a>=1e3)return s+Math.round(a/1e3).toLocaleString('en-US')+' هزار';
+  return s+Math.round(a).toLocaleString('en-US');};
+const qty=x=>N(x)==null?'—':Math.round(x).toLocaleString('en-US')+' کیلوگرم';
+const pc=(x,d=1)=>N(x)==null?'—':x.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d})+'٪';
+const int=x=>N(x)==null?'—':Math.round(x).toLocaleString('en-US');
+const SEV={critical:'بحرانی',high:'زیاد',medium:'متوسط',low:'کم'};
+const ICON={critical:'M8 1.2 1 14h14L8 1.2Zm0 4.6v4m0 2v.9',
+            high:'M8 1.2 1 14h14L8 1.2Zm0 4.6v4m0 2v.9',
+            medium:'M8 14A6 6 0 1 0 8 2a6 6 0 0 0 0 12Zm0-9v4m0 2v.6',
+            low:'M8 14A6 6 0 1 0 8 2a6 6 0 0 0 0 12Z',
+            good:'M2.5 8.5 6 12l7.5-8'};
+const sicon=k=>`<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"
+  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${ICON[k]||ICON.low}"/></svg>`;
+const chip=(k,txt)=>el('span',{class:'chip '+k,html:sicon(k)+'<span>'+txt+'</span>'});
+const api=async(u,o)=>{const r=await fetch(u,o); if(!r.ok)throw new Error(await r.text()); return r.json();};
+const MONTH_FA=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+function jal(iso){ if(!iso)return'—'; const [Y,M,D]=iso.slice(0,10).split('-').map(Number);
+  const leap=y=>(y%4===0&&y%100!==0)||y%400===0; const gd=[0,31,59,90,120,151,181,212,243,273,304,334];
+  const y2=Y-1600; let days=365*y2+((y2+3)/4|0)-((y2+99)/100|0)+((y2+399)/400|0)+gd[M-1]+D-1;
+  if(M>2&&leap(Y))days++; days-=79; const np=(days/12053)|0; days%=12053;
+  let jy=979+33*np+4*((days/1461)|0); days%=1461;
+  if(days>=366){jy+=((days-1)/365)|0; days=(days-1)%365;}
+  let jm,jd; if(days<186){jm=1+((days/31)|0); jd=1+days%31;} else {const d=days-186; jm=7+((d/30)|0); jd=1+d%30;}
+  return {y:jy,m:jm,d:jd,txt:`${jy}/${String(jm).padStart(2,'0')}/${String(jd).padStart(2,'0')}`,
+          short:`${MONTH_FA[jm-1].slice(0,4)} ${String(jy).slice(2)}`};}
+const jtxt=iso=>iso?jal(iso).txt:'—';
+const jshort=mk=>mk?jal(mk+'-15').short:'';
+
+/* ═══════════════════════════════ نمودار (SVG دستی) ═══════════════════════════════ */
+const cs=n=>getComputedStyle(document.body).getPropertyValue(n).trim();
+function axes(g,{x0,x1,y0,y1,ticks,fmtY,labels,step}){
+  const S=[];
+  ticks.forEach(t=>{const y=t.y;
+    S.push(`<line x1="${x0}" x2="${x1}" y1="${y}" y2="${y}" stroke="var(--grid)" stroke-width="1"/>`);
+    S.push(`<text x="${x1+7}" y="${y+4}" fill="var(--ink-3)" font-size="10.5"
+      style="font-variant-numeric:tabular-nums">${t.t}</text>`);});
+  S.push(`<line x1="${x0}" x2="${x1}" y1="${y1}" y2="${y1}" stroke="var(--axis)" stroke-width="1"/>`);
+  labels.forEach(l=>S.push(`<text x="${l.x}" y="${y1+16}" fill="var(--ink-3)" font-size="10"
+    text-anchor="middle">${l.t}</text>`));
+  return S.join('');
+}
+function niceTicks(min,max,n=4){
+  const span=max-min||1, raw=span/n, mag=Math.pow(10,Math.floor(Math.log10(raw)));
+  const step=[1,2,2.5,5,10].map(m=>m*mag).find(s=>s>=raw)||10*mag;
+  const lo=Math.floor(min/step)*step, out=[];
+  for(let v=lo;v<=max+step*0.001;v+=step) if(v>=min-step*0.001) out.push(+v.toFixed(10));
+  return out;
+}
+/** نمودار خطی — یک محور، ۲px، نشانگر ≥۸px، تولتیپ با خط راهنما */
+function lineChart(host,{series,labels,fmtY=int,fmtV=int,h=210,suffix=''}){
+  host.innerHTML='';
+  const W=760,PL=46,PR=52,PT=10,PB=24, x0=PL,x1=W-PR,y0=PT,y1=h-PB;
+  const n=labels.length; if(!n)return;
+  const all=series.flatMap(s=>s.data.filter(v=>v!=null));
+  let mn=Math.min(...all), mx=Math.max(...all);
+  const tk=niceTicks(Math.min(mn,0)===0&&mn>=0?0:mn,mx,4);
+  mn=Math.min(...tk); mx=Math.max(...tk);
+  const X=i=>x1-(i/(n-1||1))*(x1-x0);            /* راست‌به‌چپ */
+  const Y=v=>y1-((v-mn)/((mx-mn)||1))*(y1-y0);
+  const ticks=tk.map(v=>({y:Y(v),t:fmtY(v)}));
+  const every=Math.max(1,Math.ceil(n/8));
+  const labs=labels.map((t,i)=>i%every===0?{x:X(i),t:jshort(t)}:null).filter(Boolean);
+  let s=`<svg viewBox="0 0 ${W} ${h}" role="img" preserveAspectRatio="none">${axes(0,{x0,x1,y0,y1,ticks,labels:labs})}`;
+  series.forEach(se=>{
+    const pts=se.data.map((v,i)=>v==null?null:[X(i),Y(v)]).filter(Boolean);
+    s+=`<path d="${pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ')}"
+        fill="none" stroke="${se.color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+    const last=pts[0]; /* آخرین ماه در سمت چپ نیست؛ نخستین نقطهٔ آرایه سمت راست است */
+    const end=pts[pts.length-1];
+    s+=`<circle cx="${end[0]}" cy="${end[1]}" r="4.5" fill="${se.color}" stroke="var(--surface-1)" stroke-width="2"/>`;
+    s+=`<text x="${end[0]-8}" y="${end[1]-9}" fill="var(--ink-2)" font-size="10.5" text-anchor="end"
+        style="font-variant-numeric:tabular-nums">${fmtV(se.data.filter(v=>v!=null).slice(-1)[0])}${suffix}</text>`;
+  });
+  s+=`<line id="cross" x1="0" x2="0" y1="${y0}" y2="${y1}" stroke="var(--axis)" stroke-width="1" opacity="0"/>`;
+  series.forEach((se,k)=>s+=`<circle class="hp" data-k="${k}" r="4.5" fill="${se.color}"
+      stroke="var(--surface-1)" stroke-width="2" opacity="0"/>`);
+  s+=`<rect x="${x0}" y="${y0}" width="${x1-x0}" height="${y1-y0}" fill="transparent" id="hit"/></svg>`;
+  host.innerHTML=s;
+  const tip=el('div',{class:'tip'}); host.append(tip);
+  const svg=$('svg',host), cross=$('#cross',svg), hps=$$('.hp',svg);
+  $('#hit',svg).addEventListener('pointermove',ev=>{
+    const r=svg.getBoundingClientRect(), vx=(ev.clientX-r.left)/r.width*W;
+    let i=Math.round((x1-vx)/((x1-x0)/(n-1||1))); i=Math.max(0,Math.min(n-1,i));
+    cross.setAttribute('x1',X(i)); cross.setAttribute('x2',X(i)); cross.setAttribute('opacity','1');
+    hps.forEach((c,k)=>{const v=series[k].data[i];
+      if(v==null){c.setAttribute('opacity','0');return;}
+      c.setAttribute('cx',X(i)); c.setAttribute('cy',Y(v)); c.setAttribute('opacity','1');});
+    tip.innerHTML=`<div class="th">${jshort(labels[i])}</div>`+series.map(se=>
+      `<div class="tr"><span>${se.name}</span><b>${se.data[i]==null?'—':fmtV(se.data[i])+suffix}</b></div>`).join('');
+    tip.style.opacity='1';
+    const px=X(i)/W*r.width;
+    tip.style.left=Math.max(4,Math.min(r.width-150,px-70))+'px'; tip.style.top='4px';
+  });
+  $('#hit',svg).addEventListener('pointerleave',()=>{tip.style.opacity='0';
+    cross.setAttribute('opacity','0'); hps.forEach(c=>c.setAttribute('opacity','0'));});
+}
+/** نمودار میله‌ای — انتهای گرد ۴px، فاصلهٔ ۲px، تولتیپ هر میله */
+function barChart(host,{labels,data,color,fmtV=int,h=180,suffix=''}){
+  host.innerHTML='';
+  const W=760,PL=40,PR=52,PT=10,PB=24,x0=PL,x1=W-PR,y0=PT,y1=h-PB;
+  const n=labels.length; if(!n)return;
+  const tk=niceTicks(0,Math.max(...data,1),4), mx=Math.max(...tk);
+  const ticks=tk.map(v=>({y:y1-(v/mx)*(y1-y0),t:int(v)}));
+  const bw=Math.max(3,((x1-x0)/n)-2);
+  const X=i=>x1-((i+0.5)/n)*(x1-x0)-bw/2;
+  const every=Math.max(1,Math.ceil(n/8));
+  const labs=labels.map((t,i)=>i%every===0?{x:X(i)+bw/2,t:jshort(t)}:null).filter(Boolean);
+  let s=`<svg viewBox="0 0 ${W} ${h}" role="img" preserveAspectRatio="none">${axes(0,{x0,x1,y0,y1,ticks,labels:labs})}`;
+  data.forEach((v,i)=>{const hh=Math.max(1,(v/mx)*(y1-y0));
+    s+=`<rect class="bar" data-i="${i}" x="${X(i).toFixed(1)}" y="${(y1-hh).toFixed(1)}"
+        width="${bw.toFixed(1)}" height="${hh.toFixed(1)}" rx="${Math.min(4,bw/2)}" fill="${color}"/>`;});
+  s+='</svg>'; host.innerHTML=s;
+  const tip=el('div',{class:'tip'}); host.append(tip);
+  const svg=$('svg',host), r0=()=>svg.getBoundingClientRect();
+  $$('.bar',svg).forEach(b=>{
+    b.addEventListener('pointerenter',()=>{const i=+b.dataset.i, r=r0();
+      tip.innerHTML=`<div class="th">${jshort(labels[i])}</div><div class="tr"><span>مقدار</span><b>${fmtV(data[i])}${suffix}</b></div>`;
+      tip.style.opacity='1';
+      tip.style.left=Math.max(4,Math.min(r.width-150,(+b.getAttribute('x')+bw/2)/W*r.width-70))+'px';
+      tip.style.top='4px';});
+    b.addEventListener('pointerleave',()=>tip.style.opacity='0');});
+}
+/** میله افقی رتبه‌ای — رمپ ترتیبی تک‌رنگ */
+function hbars(host,rows,{onClick,fmt=int,sub}={}){
+  host.innerHTML='';
+  const mx=Math.max(...rows.map(r=>r.value),1);
+  const steps=['var(--seq-450)','var(--seq-450)','var(--seq-250)','var(--seq-250)'];
+  const wrap=el('div',{style:'display:flex;flex-direction:column;gap:6px'});
+  rows.forEach((r,i)=>{
+    const w=Math.max(1.5,r.value/mx*100);
+    const row=el('div',{style:'cursor:'+(onClick?'pointer':'default'),
+      onclick:onClick?()=>onClick(r):null});
+    row.append(el('div',{style:'display:flex;justify-content:space-between;gap:10px;font-size:12px;margin-bottom:2px'},
+      el('span',{},r.label),
+      el('span',{class:'mono',style:'color:var(--ink-2)'},fmt(r.value)+(sub?' · '+sub(r):''))));
+    row.append(el('div',{style:`height:8px;border-radius:4px;background:var(--grid);overflow:hidden`},
+      el('div',{style:`height:100%;width:${w}%;border-radius:4px;background:${steps[Math.min(3,(i/Math.max(1,rows.length-1)*3)|0)]}`})));
+    wrap.append(row);
+  });
+  host.append(wrap);
+}
+function dataTable(host,cols,rows){
+  const t=el('table',{}, el('thead',{},el('tr',{},cols.map(c=>el('th',{style:'cursor:default'},c.label)))),
+    el('tbody',{},rows.map(r=>el('tr',{style:'cursor:default'},cols.map(c=>el('td',{class:c.num?'num':''},c.get(r)))))));
+  host.innerHTML=''; host.append(el('div',{class:'twrap',style:'max-height:280px;margin-top:10px'},t));
+}
+
+/* ═══════════════════════════════ وضعیت ═══════════════════════════════ */
+let META=null, PORT=null, ROWS=[], SEL=null, SORT={key:'revenue',asc:false}, HIST=[];
+
+/* مقایسهٔ نیمهٔ اول سال‌ها: چهار شاخص بی‌واحد روی یک مقیاس مشترک */
+function renderHalves(host,H){
+  host.innerHTML='';
+  if(H.length<2){host.append(el('div',{class:'empty'},'داده کافی نیست.'));return;}
+  const rows=[
+    {k:'volume_index',  label:'حجم فروش (کیلوگرم)', raw:h=>qty(h.volume),   good:false},
+    {k:'customer_index',label:'تعداد مشتری فعال',    raw:h=>int(h.customers)+' مشتری', good:false},
+    {k:'price_index',   label:'قیمت میانگین واحد',   raw:h=>int(h.avg_unit_price), good:null},
+    {k:'revenue_index', label:'فروش اسمی',           raw:h=>money(h.revenue), good:null},
+  ];
+  const tbl=el('div',{style:'display:grid;grid-template-columns:auto repeat('+H.length+',1fr);gap:11px 14px;align-items:center'});
+  tbl.append(el('div',{}));
+  H.forEach(h=>tbl.append(el('div',{style:'font-size:12px;color:var(--ink-2);font-weight:700'},
+    h.label, el('div',{style:'font-weight:400;font-size:10.5px;color:var(--ink-3)'},h.window_fa||''))));
+  rows.forEach(r=>{
+    /* مقیاس هر سطر مستقل است و خط مرجع روی شاخص ۱۰۰ کشیده می‌شود، تا جهت
+       تغییر (کمتر یا بیشتر از پایه) بی‌واسطه دیده شود. */
+    const rmax=Math.max(100,...H.map(h=>h[r.k]))*1.04;
+    tbl.append(el('div',{style:'font-size:12.5px'},r.label,
+      el('div',{style:'font-size:10.5px;color:var(--ink-3)'},'خط مرجع = شاخص 100')));
+    H.forEach((h,j)=>{
+      const v=h[r.k], w=Math.max(1.5,v/rmax*100), ref=100/rmax*100;
+      const delta=j===0?null:v-100;
+      const col=delta==null?'var(--seq-250)':(r.good===false&&delta<0?'var(--crit)':
+                 r.good===false&&delta>0?'var(--good)':'var(--seq-450)');
+      const cell=el('div',{});
+      cell.append(el('div',{style:'display:flex;justify-content:space-between;gap:8px;font-size:11.5px;margin-bottom:3px'},
+        el('span',{class:'mono',style:'color:var(--ink-2)'},r.raw(h)),
+        el('span',{class:'mono',style:'font-weight:700;color:'+(delta==null?'var(--ink-3)':col)},
+          'شاخص '+int(v)+(delta==null?' (پایه)':delta>0?' ▲':' ▼'))));
+      cell.append(el('div',{style:'height:9px;border-radius:4px;background:var(--grid);position:relative;overflow:hidden'},
+        el('div',{style:`height:100%;width:${w}%;border-radius:4px;background:${col}`}),
+        el('div',{style:`position:absolute;top:0;bottom:0;right:${ref}%;width:1.5px;background:var(--ink-3)`})));
+      tbl.append(cell);
+    });
+  });
+  host.append(tbl);
+  const a=H[0],b=H[H.length-1];
+  host.append(el('div',{class:'caveat',style:'margin-top:14px'},
+    `از ${a.label} تا ${b.label}: حجم ${pc(Math.abs(b.volume_index-100),0)} `+
+    `${b.volume_index<100?'کاهش':'افزایش'} یافته و تعداد مشتری فعال از ${int(a.customers)} به `+
+    `${int(b.customers)} رسیده، در حالی که فروش اسمی ${int(b.revenue_index/100*10)/10} برابر شده — `+
+    `چون قیمت میانگین واحد ${int(b.price_index/100*10)/10} برابر شده است. `+
+    `حاشیه سود در همین بازه از ${pc(a.margin_pct)} به ${pc(b.margin_pct)} رسیده: `+
+    `افزایش بهای تمام‌شده به مشتری منتقل شده و هیچ گسترش حاشیه‌ای رخ نداده است.`));
+}
+
+/* ═══════════════════════════════ نمای کل ═══════════════════════════════ */
+function renderOverview(){
+  const s=PORT;
+  const tiles=[
+    ['فروش اسمی',money(s.revenue_nominal),'حقیقی (تعدیل تورم): '+money(s.revenue_real),''],
+    ['حجم فروش',int(s.volume/1000)+' تن',s.customers_with_sales+' مشتری با سابقهٔ خرید',''],
+    ['سود ناخالص',money(s.gross_profit),'حاشیه '+pc(s.gross_margin_pct)+' · '+pc(s.realized_cost_share_pct,0)+' مبنای تحقق‌یافته',''],
+    ['مطالبات معوق',money(s.overdue),pc(s.overdue_pct_of_revenue)+' فروش · '+s.overdue_x_gross_profit+' برابر سود ناخالص','neg'],
+    ['مشارکت خالص',money(s.net_contribution),s.net_negative_customers+' مشتری منفی ('+pc(s.net_negative_revenue_share_pct)+' فروش)',s.net_contribution<0?'neg':'pos'],
+    ['مشتری راکد',int(s.dormant_180d)+' نفر','بیش از ۱۸۰ روز بی‌خرید · تمرکز ۱۰ مشتری اول '+pc(s.top10_revenue_share_pct),''],
+  ];
+  $('#kpis').innerHTML='';
+  tiles.forEach(([lab,val,sub,cls])=>$('#kpis').append(
+    el('div',{class:'tile '+cls}, el('div',{class:'lab'},lab),
+      el('div',{class:'val'},val), el('div',{class:'sub'},sub))));
+
+  /* مقایسهٔ نیمهٔ اول سال‌ها — سرصفحهٔ روایت */
+  $('#halves-note').textContent='مقایسهٔ فصل بهار سال‌های شمسی — هم‌ارزترین مقایسهٔ ممکن در این داده. '+(s.half_year_note||'')+' همهٔ شاخص‌ها بر پایهٔ بهار '+((s.half_years||[{}])[0].jyear||'')+' = 100.';
+  renderHalves($('#halves'),s.half_years||[]);
+
+  const m=s.monthly.filter(r=>!r.is_partial), labels=m.map(r=>r.month_key);
+  $('#lg-index').innerHTML=
+    `<span><i style="background:var(--series-1)"></i>شاخص فروش اسمی</span>`+
+    `<span><i style="background:var(--series-2)"></i>شاخص حجم (کیلوگرم)</span>`;
+  lineChart($('#ch-index'),{labels,series:[
+    {name:'شاخص فروش اسمی',color:cs('--series-1'),data:m.map(r=>r.revenue_index)},
+    {name:'شاخص حجم',color:cs('--series-2'),data:m.map(r=>r.volume_index)}]});
+  $('#lg-margin').innerHTML=`<span><i style="background:var(--series-1)"></i>حاشیه سود ناخالص ماهانه</span>`;
+  lineChart($('#ch-margin'),{labels,series:[
+    {name:'حاشیه سود',color:cs('--series-1'),data:m.map(r=>r.margin_pct)}],
+    fmtY:v=>v.toFixed(0)+'٪',fmtV:v=>v.toFixed(1),suffix:'٪'});
+
+  hbars($('#riskbars'),s.risk_counts.map(r=>({...r,value:r.customers})),{
+    fmt:v=>int(v)+' مشتری', sub:r=>'معوق '+money(r.overdue),
+    onClick:r=>{go('customers'); $('#f-risk').value=r.code; loadCustomers();}});
+  hbars($('#oppbars'),s.opportunity_counts.map(r=>({...r,value:r.customers})),{
+    fmt:v=>int(v)+' مشتری', sub:r=>'فروش '+money(r.revenue),
+    onClick:r=>{go('customers'); $('#f-opp').value=r.code; loadCustomers();}});
+
+  $('#caveats').innerHTML=META.data_caveats.map(c=>`<li>${c}</li>`).join('');
+
+  $$('.toggle').forEach(b=>b.onclick=()=>{
+    const host=$('#tb-'+b.dataset.table), open=!host.hidden;
+    host.hidden=open; b.textContent=open?'نمایش جدول داده':'بستن جدول داده';
+    if(!open){
+      if(b.dataset.table==='ch-index') dataTable(host,
+        [{label:'ماه',get:r=>jal(r.month_key+'-15').short+(r.is_partial?' (ناقص)':'')},
+         {label:'شاخص فروش',num:1,get:r=>int(r.revenue_index)},
+         {label:'شاخص حجم',num:1,get:r=>int(r.volume_index)},
+         {label:'فروش',num:1,get:r=>money(r.revenue)},
+         {label:'حجم',num:1,get:r=>int(r.volume)},
+         {label:'مشتری فعال',num:1,get:r=>int(r.customers)}],s.monthly);
+      else dataTable(host,
+        [{label:'ماه',get:r=>jal(r.month_key+'-15').short},
+         {label:'حاشیه سود',num:1,get:r=>pc(r.margin_pct)},
+         {label:'سود ناخالص',num:1,get:r=>money(r.gross_profit)}],s.monthly);
+    }});
+}
+
+/* ═══════════════════════════════ جدول مشتریان ═══════════════════════════════ */
+const COLS=[
+  {k:'customer_id',label:'شناسه',get:r=>r.customer_id},
+  {k:'segment',label:'بخش',get:r=>r.segment},
+  {k:'revenue',label:'فروش',num:1,get:r=>money(r.revenue)},
+  {k:'gross_profit',label:'سود ناخالص',num:1,get:r=>money(r.gross_profit)},
+  {k:'margin_pct',label:'حاشیه',num:1,get:r=>pc(r.margin_pct)},
+  {k:'overdue',label:'معوق',num:1,get:r=>money(r.overdue)},
+  {k:'net_contribution',label:'مشارکت خالص',num:1,
+   get:r=>el('span',{style:'color:'+(r.net_contribution<0?'var(--crit)':'var(--good-ink)')},money(r.net_contribution))},
+  {k:'days_since_purchase',label:'روز از خرید',num:1,get:r=>int(r.days_since_purchase)},
+  {k:'volume_trend',label:'روند حجم ۶ماه',num:1,get:r=>N(r.volume_trend)==null?'—':
+   el('span',{style:'color:'+(r.volume_trend<0?'var(--crit)':'var(--good-ink)')},pc(r.volume_trend,0))},
+  {k:'open_complaints',label:'شکایت باز',num:1,get:r=>int(r.open_complaints)},
+  {k:'top_risk',label:'ریسک اصلی',get:r=>r.top_risk||'—'},
+  {k:'top_opportunity',label:'فرصت اصلی',get:r=>r.top_opportunity||'—'},
+];
+function renderHead(){
+  $('#thead').innerHTML='';
+  COLS.forEach(c=>$('#thead').append(el('th',{onclick:()=>{
+      SORT = SORT.key===c.k ? {key:c.k,asc:!SORT.asc} : {key:c.k,asc:c.k==='margin_pct'||c.k==='net_contribution'};
+      loadCustomers();}},
+    c.label+(SORT.key===c.k?'':''),
+    SORT.key===c.k?el('span',{class:'arw'},SORT.asc?' ▲':' ▼'):null)));
+}
+async function loadCustomers(){
+  const p=new URLSearchParams({q:$('#f-q').value.trim(),sort_by:SORT.key,ascending:SORT.asc,
+    segment:$('#f-seg').value,risk:$('#f-risk').value,opportunity:$('#f-opp').value,limit:200});
+  const d=await api('/api/customers?'+p); ROWS=d.rows;
+  renderHead();
+  const tb=$('#tbody'); tb.innerHTML='';
+  ROWS.forEach(r=>{
+    const tr=el('tr',{onclick:()=>selectCustomer(r.customer_id)},
+      COLS.map(c=>el('td',{class:c.num?'num':''},c.get(r))));
+    if(r.customer_id===SEL)tr.classList.add('sel');
+    tb.append(tr);});
+  $('#tblnote').textContent=`${d.shown} مشتری نمایش داده شد از ${d.total} مشتری. برای دیدن پروفایل یکپارچه روی هر سطر کلیک کنید.`;
+  if(!ROWS.length)$('#tblnote').textContent='هیچ مشتری با این شرایط یافت نشد.';
+}
+
+/* ═══════════════════════════════ پروفایل مشتری ═══════════════════════════════ */
+async function selectCustomer(cid){
+  SEL=cid; $$('#tbody tr').forEach(tr=>tr.classList.toggle('sel',tr.textContent.startsWith(cid)));
+  const p=await api('/api/customer/'+cid); renderDetail(p);
+  $('#detail').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function renderDetail(p){
+  const i=p.identity,c=p.commercial,m=p.margin,r=p.receivables,d=p.dates_fa;
+  const host=$('#detail'); host.innerHTML='';
+
+  /* هویت و خلاصه */
+  const head=el('div',{class:'card',style:'margin-bottom:14px'});
+  head.append(el('div',{style:'display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;margin-bottom:8px'},
+    el('h2',{style:'font-size:19px'},'مشتری '+p.customer_id),
+    el('span',{class:'chip'},'بخش '+i.segment),
+    el('span',{class:'chip'},'کارشناس '+i.sales_rep_id),
+    el('span',{class:'chip'},'موقعیت '+i.location_id),
+    el('span',{class:'chip'},'رتبه فروش '+int(c.revenue_rank)+' از '+META.customers),
+    ...(p.risks.slice(0,1).map(x=>chip(x.severity,x.title)))));
+  head.append(el('p',{style:'font-size:13.5px;line-height:1.9;margin:0 0 12px'},p.summary));
+  head.append(el('dl',{class:'kv'},
+    el('dt',{},'آغاز همکاری'),el('dd',{},d.relationship_start+` (${int(i.tenure_days)} روز)`),
+    el('dt',{},'نخستین و آخرین خرید'),el('dd',{},d.first_purchase+' → '+d.last_purchase),
+    el('dt',{},'سقف اعتبار / مهلت پرداخت'),el('dd',{},money(i.credit_limit)+' / '+int(i.payment_terms_days)+' روز'),
+    el('dt',{},'آخرین تعامل ثبت‌شده'),el('dd',{},d.last_interaction+
+      (c.days_since_last_purchase!=null?` · آخرین خرید ${int(c.days_since_last_purchase)} روز پیش`:''))));
+  host.append(head);
+
+  /* کاشی‌ها */
+  const tiles=[
+    ['فروش اسمی',money(c.revenue_nominal),'حقیقی '+money(c.revenue_real),''],
+    ['حجم خرید',qty(c.volume),c.active_months+' ماه فعال · '+int(c.order_lines)+' خط فروش',''],
+    ['سود ناخالص',money(m.gross_profit),'حاشیه '+pc(m.gross_margin_pct)+' · میانگین سبد '+pc(PORT.gross_margin_pct),''],
+    ['مطالبات معوق',money(r.uncollected_overdue),'سررسیدنشده '+money(r.uncollected_not_yet_due)+
+      (r.oldest_overdue_days?' · قدیمی‌ترین '+int(r.oldest_overdue_days)+' روز':''),r.uncollected_overdue>0?'neg':''],
+    ['مشارکت خالص',money(r.net_contribution),'سود ناخالص منهای معوق',r.net_contribution<0?'neg':'pos'],
+    ['سهم از سبد مشتری',pc(p.wallet_share.avg_share_pct),
+      'میانگین بخش '+pc(p.wallet_share.segment_avg_share_pct)+' · خرید برآوردی '+qty(p.wallet_share.estimated_total_purchase)+'/ماه',''],
+  ];
+  const kp=el('div',{class:'grid g6',style:'margin-bottom:14px'});
+  tiles.forEach(([l,v,s,cl])=>kp.append(el('div',{class:'tile '+cl},
+    el('div',{class:'lab'},l),el('div',{class:'val'},v),el('div',{class:'sub'},s))));
+  host.append(kp);
+
+  /* اقدام بعدی */
+  const nbaCard=el('div',{class:'card',style:'margin-bottom:14px'});
+  nbaCard.append(el('h3',{},'اقدام بعدی پیشنهادی'),
+    el('p',{class:'hint'},'رتبه‌بندی بر پایهٔ «مبلغ در معرض خطر × فوریت». مالک هر اقدام مشخص است تا قابل پیگیری باشد.'));
+  if(p.next_best_actions.length){
+    const w=el('div',{class:'nba'});
+    p.next_best_actions.forEach(x=>w.append(el('div',{class:'nbaitem'},
+      el('div',{class:'rank'},String(x.rank)),
+      el('div',{class:'body'},
+        el('div',{class:'a'},x.action),
+        el('div',{class:'m'},el('span',{},'مسئول: '+x.owner),el('span',{},x.kind_fa),
+          el('span',{},'مبلغ در معرض: '+money(x.value)),el('span',{},'امتیاز '+x.score)),
+        el('div',{class:'e'},'دلیل: '+x.evidence)))));
+    nbaCard.append(w);
+  } else nbaCard.append(el('div',{class:'empty'},'اقدام فوری‌ای شناسایی نشد.'));
+  host.append(nbaCard);
+
+  /* ریسک و فرصت */
+  const ro=el('div',{class:'grid g2',style:'margin-bottom:14px'});
+  const rc=el('div',{class:'card'},el('h3',{},`ریسک‌ها (${p.risks.length})`),
+    el('p',{class:'hint'},'هر ریسک با شاهد عددی خودش، تا کارشناس بتواند راستی‌آزمایی کند.'));
+  const rl=el('div',{class:'rlist'});
+  p.risks.length?p.risks.forEach(x=>rl.append(el('div',{class:'ritem '+x.severity},
+    el('div',{class:'t'},x.title,chip(x.severity,SEV[x.severity])),
+    el('div',{class:'ev'},x.evidence),
+    el('div',{class:'ac'},'اقدام: '+x.action,el('div',{class:'ow'},x.owner+
+      (x.value_at_stake?' · مبلغ در معرض '+money(x.value_at_stake):''))))))
+   :rl.append(el('div',{class:'empty'},'ریسکی شناسایی نشد.'));
+  rc.append(rl);
+  const oc=el('div',{class:'card'},el('h3',{},`فرصت‌ها (${p.opportunities.length})`),
+    el('p',{class:'hint'},'فرصت‌های قابل اقدام، جایی که مبلغ قابل برآورد بوده کمّی شده است.'));
+  const ol=el('div',{class:'rlist'});
+  p.opportunities.length?p.opportunities.forEach(x=>ol.append(el('div',{class:'ritem '+x.potential},
+    el('div',{class:'t'},x.title,chip(x.potential==='high'?'good':x.potential,SEV[x.potential])),
+    el('div',{class:'ev'},x.evidence),
+    el('div',{class:'ac'},'اقدام: '+x.action,el('div',{class:'ow'},x.owner+
+      (x.value?' · ارزش برآوردی '+money(x.value):''))))))
+   :ol.append(el('div',{class:'empty'},'فرصتی شناسایی نشد.'));
+  oc.append(ol); ro.append(rc,oc); host.append(ro);
+
+  /* سودآوری و نمودار */
+  const pr=el('div',{class:'grid g2',style:'margin-bottom:14px'});
+  const pc1=el('div',{class:'card'},el('h3',{},'سودآوری و بهای تمام‌شده'),
+    el('p',{class:'hint'},`${pc(m.realized_cost_share_pct,0)} خطوط این مشتری بر مبنای هزینهٔ تحقق‌یافته محاسبه شده و بقیه بر مبنای هزینهٔ برآوردی محصول-ماه. مبنای برآوردی حاشیه را حدود ۵ واحد درصد خوش‌بینانه‌تر نشان می‌دهد.`),
+    el('dl',{class:'kv'},
+      el('dt',{},'فروش'),el('dd',{},money(c.revenue_nominal)),
+      el('dt',{},'سود ناخالص'),el('dd',{},money(m.gross_profit)+' ('+pc(m.gross_margin_pct)+')'),
+      el('dt',{},'رتبه سود در سبد'),el('dd',{},int(m.gp_rank)+' از '+META.customers),
+      el('dt',{},'خطوط زیان‌ده'),el('dd',{},int(m.negative_margin_lines)+' خط ('+pc(m.negative_margin_line_pct,0)+') با '+money(Math.abs(m.gross_profit_destroyed))+' زیان'),
+      el('dt',{},'میانگین ارزش فاکتور'),el('dd',{},money(c.avg_order_value)),
+      el('dt',{},'نرخ وصول'),el('dd',{},pc(r.collection_rate_pct)+' · '+int(r.invoices_fully_collected)+' تسویه، '+int(r.invoices_partially_collected)+' ناقص، '+int(r.invoices_uncollected)+' بدون وصول'),
+      el('dt',{},'تأخیر پرداخت'),el('dd',{},'میانگین '+int(r.avg_days_late)+' روز، بیشینه '+int(r.max_days_late)+' روز'+(r.bounced_cheques?' · '+int(r.bounced_cheques)+' چک برگشتی':''))));
+  const ch=el('div',{class:'card'},el('h3',{},'حجم خرید ماهانه'),
+    el('p',{class:'hint'},'حجم مبنای درست روند است، چون از تورم مصون است.'));
+  const chost=el('div',{class:'chart'}); ch.append(chost);
+  pr.append(pc1,ch); host.append(pr);
+  const cm=c.monthly.filter(x=>!(PORT.partial_months||[]).includes(x.month_key));
+  if(cm.length) barChart(chost,{labels:cm.map(x=>x.month_key),
+    data:cm.map(x=>x.volume),color:cs('--series-2'),fmtV:v=>int(v)+' کیلوگرم'});
+  else if(!cm.length) chost.append(el('div',{class:'empty'},'داده‌ای برای نمودار نیست.'));
+
+  /* محصولات و ترکیب */
+  const mix=el('div',{class:'grid g3',style:'margin-bottom:14px'});
+  const prods=el('div',{class:'card'},el('h3',{},'محصولات اصلی'));
+  if(c.top_products.length){
+    const t=el('table',{},el('thead',{},el('tr',{},
+      ['شرح کالا','فروش','حجم','حاشیه'].map(x=>el('th',{style:'cursor:default'},x)))),
+      el('tbody',{},c.top_products.map(x=>el('tr',{style:'cursor:default'},
+        el('td',{style:'white-space:normal;min-width:180px'},x.desc),
+        el('td',{class:'num'},money(x.revenue)),el('td',{class:'num'},int(x.qty)),
+        el('td',{class:'num',style:'color:'+(x.margin_pct<0?'var(--crit)':'inherit')},pc(x.margin_pct))))));
+    prods.append(el('div',{class:'twrap',style:'max-height:none'},t));
+  } else prods.append(el('div',{class:'empty'},'—'));
+  const mixc=el('div',{class:'card'},el('h3',{},'ترکیب سبد خرید'));
+  const mb=el('div',{}); mixc.append(mb);
+  const fam=Object.entries(c.product_family_mix).map(([k,v])=>({label:k,value:v}));
+  if(fam.length) hbars(mb,fam,{fmt:v=>pc(v,0)}); else mb.append(el('div',{class:'empty'},'—'));
+  if(c.cross_sell_families.length) mixc.append(el('p',{class:'hint',style:'margin-top:12px'},
+    'گروه‌های فروخته‌نشده که هم‌بخشی‌ها می‌خرند: '+c.cross_sell_families.join('، ')));
+  const payc=el('div',{class:'card'},el('h3',{},'شرایط پرداخت و رقبا'));
+  const pb=el('div',{}); payc.append(pb);
+  const pay=Object.entries(c.payment_type_mix).map(([k,v])=>({label:FA(k),value:v}));
+  if(pay.length) hbars(pb,pay,{fmt:v=>pc(v,0)}); else pb.append(el('div',{class:'empty'},'—'));
+  const comp=Object.entries(p.wallet_share.main_competitors||{});
+  if(comp.length) payc.append(el('p',{class:'hint',style:'margin-top:12px'},
+    'رقبای گزارش‌شده: '+comp.map(([k,v])=>FA(k)+' ('+v+' ماه)').join('، ')));
+  mix.append(prods,mixc,payc); host.append(mix);
+
+  /* خط زمان تعاملات و شکایات */
+  const tlc=el('div',{class:'card',style:'margin-bottom:14px'});
+  tlc.append(el('h3',{},'تاریخچهٔ یکپارچهٔ تعاملات'),
+    el('p',{class:'hint'},'شکایت‌ها، گزارش‌های کارشناس فروش و درخواست‌های توسعه، همه در یک خط زمان — همان چیزی که امروز در چند سامانهٔ جدا پراکنده است.'));
+  const ev=[
+    ...p.complaints.items.map(x=>({...x,k:'شکایت',cls:'c',
+      head:`شکایت — ${FA(x.severity)} / ${FA(x.status)}`,body:x.title+(x.text?' — '+x.text:'')})),
+    ...p.engagement.items.map(x=>({...x,k:'تعامل',cls:'i',
+      head:`تعامل CRM — ${FA(x.type)} · کارشناس ${x.rep}`,body:x.summary})),
+    ...p.development.items.map(x=>({...x,k:'توسعه',cls:'d',
+      head:`درخواست توسعه — ${FA(x.type)} / ${FA(x.status)} · ${FA(x.owner)}`,body:x.requirement})),
+  ].filter(x=>x.date).sort((a,b)=>b.date.localeCompare(a.date));
+  if(ev.length){
+    const tl=el('div',{class:'tl'});
+    ev.slice(0,18).forEach(x=>tl.append(el('div',{class:'tli '+x.cls},
+      el('div',{class:'h'},el('span',{class:'dt'},jtxt(x.date)),el('span',{class:'chip'},x.k),
+        el('span',{style:'color:var(--ink-2)'},x.head)),
+      el('div',{class:'x'},x.body))));
+    tlc.append(tl);
+    if(ev.length>18) tlc.append(el('p',{class:'hint',style:'margin-top:10px'},
+      `${ev.length-18} رویداد قدیمی‌تر نمایش داده نشده است.`));
+  } else tlc.append(el('div',{class:'empty'},'رویدادی ثبت نشده است.'));
+  host.append(tlc);
+
+  /* کیفیت و اثر شکایت */
+  const qa=el('div',{class:'grid g2',style:'margin-bottom:14px'});
+  const qc=el('div',{class:'card'},el('h3',{},'کیفیت آزمایشگاهی'));
+  if(p.quality.lab_records) qc.append(el('dl',{class:'kv'},
+    el('dt',{},'رکورد آزمایشگاه'),el('dd',{},int(p.quality.lab_records)+' ('+int(p.quality.lab_failures)+' رد)'),
+    el('dt',{},'استحکام'),el('dd',{},p.quality.avg_tensile_cN_dtex+' cN/dtex'),
+    el('dt',{},'کشش'),el('dd',{},pc(p.quality.avg_elongation_pct)),
+    el('dt',{},'یکنواختی CV'),el('dd',{},pc(p.quality.avg_evenness_cv_pct)),
+    el('dt',{},'جذب روغن'),el('dd',{},pc(p.quality.avg_oil_pickup_pct,2))));
+  else qc.append(el('div',{class:'empty'},'رکورد آزمایشگاهی مرتبط با خطوط فروش این مشتری موجود نیست.'));
+  const ic=el('div',{class:'card'},el('h3',{},'اثر شکایت بر رفتار خرید'),
+    el('p',{class:'hint'},'مقایسهٔ حجم خرید در ۹۰ روز پیش و پس از نخستین شکایت. این شاهد است، نه اثبات علیت.'));
+  const imp=p.complaints.purchase_impact;
+  if(imp){
+    const dir=imp.change_pct==null?null:(imp.change_pct<0?'کاهش':'افزایش');
+    ic.append(el('dl',{class:'kv'},
+      el('dt',{},'نخستین شکایت'),el('dd',{},jtxt(imp.first_complaint)),
+      el('dt',{},'حجم ۹۰ روز پیش از آن'),el('dd',{},qty(imp.volume_before)),
+      el('dt',{},'حجم ۹۰ روز پس از آن'),el('dd',{},qty(imp.volume_after)),
+      el('dt',{},'تغییر'),el('dd',{},imp.change_pct==null?'—':
+        el('span',{style:'color:'+(imp.change_pct<0?'var(--crit)':'var(--good-ink)')},
+          pc(Math.abs(imp.change_pct),0)+' '+dir))));
+    if(!imp.window_complete) ic.append(el('p',{class:'hint',style:'margin-top:10px'},
+      'پنجرهٔ ۹۰ روزهٔ پس از شکایت کامل در بازهٔ داده نیست؛ مقایسه محتاطانه تفسیر شود.'));
+    ic.append(el('p',{class:'hint',style:'margin-top:6px'},
+      `شکایت‌ها: ${Object.entries(p.complaints.by_severity).map(([k,v])=>FA(k)+'×'+v).join('، ')} · `+
+      `${int(p.complaints.linked_order_lines)} خط فروش درگیر · برگشتی ${qty(p.complaints.returned_qty)}`));
+  } else ic.append(el('div',{class:'empty'},'این مشتری شکایتی ثبت نکرده است.'));
+  qa.append(qc,ic); host.append(qa);
+
+  /* متن کامل پروفایل */
+  const raw=el('div',{class:'card'});
+  raw.append(el('h3',{},'متن کامل پروفایل (زمینهٔ ارسالی به مدل زبانی)'),
+    el('p',{class:'hint'},'همین متن است که به دستیار هوشمند داده می‌شود؛ حدود ۷۰۰ توکن به‌جای ۲۵۰۰ توکن معادل JSON.'));
+  const btn=el('button',{class:'iconbtn'},'نمایش متن');
+  const box=el('pre',{style:'display:none;white-space:pre-wrap;font-family:inherit;font-size:12.5px;background:var(--plane);padding:14px;border-radius:8px;margin-top:10px;line-height:1.9;max-height:420px;overflow:auto'},p.profile_text);
+  btn.onclick=()=>{const open=box.style.display!=='none';
+    box.style.display=open?'none':'block'; btn.textContent=open?'نمایش متن':'بستن متن';};
+  raw.append(btn,box); host.append(raw);
+}
+const FA_MAP={active:'فعال',inactive:'غیرفعال',yes:'بله',no:'خیر',low:'کم',medium:'متوسط',high:'زیاد',
+ critical:'بحرانی',closed:'بسته‌شده',under_review:'در حال بررسی',accepted:'پذیرفته‌شده',rejected:'ردشده',
+ needs_review:'نیازمند بررسی',handled:'رسیدگی‌شده',open:'باز',expired:'منقضی‌شده',negotiating:'در مذاکره',
+ pending:'بی‌پاسخ',term:'مدت‌دار',price:'قیمتی',volume:'حجمی',in_development:'در حال توسعه',
+ sample_approved:'نمونه تأیید',technically_rejected:'رد فنی',cash_or_prepaid:'نقدی/پیش‌پرداخت',
+ short_term:'کوتاه‌مدت',long_term:'بلندمدت',payment_generalized:'سایر شرایط',purchase_plan:'برنامه خرید',
+ technical_service:'خدمات فنی',price_and_discount:'قیمت و تخفیف',product_sample:'نمونه محصول',
+ receivables_chase:'وصول مطالبات',order_followup:'پیگیری سفارش',product_quality:'کیفیت محصول',
+ send_sample:'ارسال نمونه',technical_visit:'بازدید فنی',no_action:'بدون اقدام',price_meeting:'جلسه قیمت',
+ phone_followup:'پیگیری تلفنی',custom_packaging:'بسته‌بندی اختصاصی',strength_improvement:'بهبود استحکام',
+ colour_shade_improvement:'بهبود شید رنگ',filament_count_change:'تغییر تعداد فیلامنت',denier_change:'تغییر دنیر',
+ hairiness_reduction:'کاهش پرز',production_planning:'برنامه‌ریزی تولید',r_and_d:'تحقیق‌وتوسعه',
+ quality_control:'کنترل کیفیت',Competitor_X:'رقیب X',Competitor_Y:'رقیب Y',Competitor_Z:'رقیب Z',
+ Local_Supplier:'تأمین‌کننده محلی'};
+const FA=k=>FA_MAP[k]||k;
+
+/* ═══════════════════════════════ جست‌وجوی متن ═══════════════════════════════ */
+async function runTextSearch(){
+  const q=$('#t-q').value.trim(); if(!q)return;
+  $('#t-results').innerHTML='<div class="card"><div class="empty"><span class="spin"></span> در حال جست‌وجو…</div></div>';
+  const d=await api('/api/search_text?'+new URLSearchParams({q,kind:$('#t-kind').value,limit:30}));
+  $('#t-summary').innerHTML='';
+  if(!d.hits.length){
+    $('#t-summary').append(el('div',{class:'empty'},d.note||`هیچ رکوردی شامل «${q}» یافت نشد.`));
+    $('#t-results').innerHTML=''; return;}
+  $('#t-summary').append(el('div',{class:'caveat'},
+    `${int(d.total)} رکورد متنی در ${int(d.customers)} مشتری یافت شد. `+
+    'پرتکرارترین مشتریان: '+d.top_customers.map(([c,n])=>`${c} (${n})`).join('، ')));
+  const wrap=el('div',{class:'card'});
+  const tl=el('div',{class:'tl'});
+  d.hits.forEach(h=>{
+    const cls=h.kind==='شکایت'?'c':h.kind==='درخواست توسعه'?'d':'i';
+    tl.append(el('div',{class:'tli '+cls},
+      el('div',{class:'h'},el('span',{class:'dt'},h.date_fa),el('span',{class:'chip'},h.kind),
+        el('button',{class:'iconbtn',onclick:()=>{go('customers');$('#f-q').value=h.customer_id;
+          loadCustomers().then(()=>selectCustomer(h.customer_id));}},h.customer_id),
+        el('span',{style:'color:var(--ink-2)'},h.title+' · '+h.meta)),
+      el('div',{class:'x'},h.text)));});
+  wrap.append(el('h3',{},'رکوردهای یافت‌شده'),
+    el('p',{class:'hint'},'برای رفتن به پروفایل کامل، روی شناسهٔ مشتری کلیک کنید.'),tl);
+  $('#t-results').innerHTML=''; $('#t-results').append(wrap);
+}
+
+/* ═══════════════════════════════ دستیار ═══════════════════════════════ */
+function bubble(role,text,extra){
+  const m=el('div',{class:'msg '+(role==='user'?'u':'a')},text);
+  if(extra)m.append(el('div',{class:'tools'},extra));
+  $('#msgs').append(m); $('#msgs').scrollTop=$('#msgs').scrollHeight; return m;}
+async function ask(q){
+  if(!q.trim())return;
+  $('#q').value=''; $('#send').disabled=true;
+  bubble('user',q);
+  const wait=bubble('assistant','در حال تحلیل…');
+  wait.innerHTML='<span class="spin"></span> در حال تحلیل…';
+  try{
+    const r=await api('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({question:q,history:HIST.slice(-6)})});
+    wait.remove();
+    const tools=(r.trace||[]).map(t=>t.tool).join(' → ');
+    const note=[tools?'ابزارها: '+tools:'',r.mode==='deterministic'?'حالت قطعی (بدون مدل زبانی)':
+      'مدل: '+(r.model||'Gemini'),r.fallback_reason||''].filter(Boolean).join(' · ');
+    bubble('assistant',r.answer,note);
+    HIST.push({role:'user',content:q},{role:'assistant',content:r.answer});
+  }catch(e){wait.remove(); bubble('assistant','خطا در دریافت پاسخ: '+e.message);}
+  $('#send').disabled=false; $('#q').focus();
+}
+
+/* ═══════════════════════════════ راه‌اندازی ═══════════════════════════════ */
+function go(v){
+  $$('nav.tabs button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.v===v)));
+  $$('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+(async function init(){
+  $$('nav.tabs button').forEach(b=>b.onclick=()=>go(b.dataset.v));
+  $('#theme').onclick=()=>{
+    const cur=document.documentElement.getAttribute('data-theme');
+    const next=cur==='dark'?'light':cur==='light'?'dark':
+      (matchMedia('(prefers-color-scheme: dark)').matches?'light':'dark');
+    document.documentElement.setAttribute('data-theme',next);
+    if(PORT)renderOverview(); if(SEL)selectCustomer(SEL);
+  };
+  try{
+    META=await api('/api/meta'); PORT=await api('/api/portfolio');
+  }catch(e){ document.body.innerHTML='<main><div class="card"><h3>سرور در دسترس نیست</h3><p class="hint">'+e.message+'</p></div></main>'; return;}
+
+  $('#asof').innerHTML='<span class="dot"></span>داده تا '+META.as_of_fa;
+  const live=META.copilot_mode==='gemini';
+  $('#mode').className='badge '+(live?'live':'det');
+  $('#mode').innerHTML='<span class="dot"></span>'+(live?'دستیار: '+META.copilot_model:'دستیار: حالت قطعی');
+  $('#mode').title=live?'':'کلید GEMINI_API_KEY تنظیم نشده — پاسخ‌ها از موتور قاعده‌محور تولید می‌شود.';
+
+  META.sort_options.forEach(o=>$('#f-sort').append(el('option',{value:o.key+'|'+o.asc},o.label)));
+  META.risk_codes.forEach(o=>$('#f-risk').append(el('option',{value:o.code},o.label)));
+  META.opportunity_codes.forEach(o=>$('#f-opp').append(el('option',{value:o.code},o.label)));
+  $('#f-sort').onchange=()=>{const [k,a]=$('#f-sort').value.split('|');
+    SORT={key:k,asc:a==='true'}; loadCustomers();};
+  ['#f-seg','#f-risk','#f-opp'].forEach(s=>$(s).onchange=loadCustomers);
+  let tmr; $('#f-q').oninput=()=>{clearTimeout(tmr); tmr=setTimeout(loadCustomers,220);};
+  $('#t-go').onclick=runTextSearch;
+  $('#t-q').onkeydown=e=>{if(e.key==='Enter')runTextSearch();};
+  $('#send').onclick=()=>ask($('#q').value);
+  $('#q').onkeydown=e=>{if(e.key==='Enter')ask($('#q').value);};
+  META.suggested_questions.forEach(q=>$('#sugg').append(
+    el('button',{onclick:()=>ask(q)},q)));
+
+  renderOverview(); loadCustomers();
+  bubble('assistant','سلام. من دستیار تحلیل مشتریان هستم.\n\nهر عددی که می‌گویم از ابزارهای تحلیلی می‌آید، نه از حدس مدل — ابزارهای فراخوانی‌شده را زیر هر پاسخ می‌بینید.\n\nمی‌توانید دربارهٔ کل سبد، یک مشتری خاص، یا متن شکایت‌ها و گزارش‌های کارشناسان بپرسید.');
+})();
+</script>
+</body>
+</html>
