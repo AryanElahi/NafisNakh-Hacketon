@@ -4,3 +4,4 @@
 ### 2- save the processed results into './data/processed'
 
 ## for EDA process (Exploratory Data Analysis) there are a two files in 'notebooks' folder resepectivly 'eda_ar.ipynb' and 'eda_mo.ipynb' for each member.
+## roger that chief
